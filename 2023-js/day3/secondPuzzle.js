@@ -4,7 +4,7 @@ readFile('./data.txt', (err, input) => {
     if (err) throw err;
 
     let data = input.toString('utf8').split('\n').slice(0, -1);
-    data = data.slice(0, 4);
+    // data = data.slice(0, 4);
 
     function createMatrix(info){
         let matrix = []
@@ -51,22 +51,38 @@ readFile('./data.txt', (err, input) => {
     function getAllGearsRatio(info){
         const gears = info.symbols.filter(x => x.char == '*');
 
-        gears.forEach(gear => {
-           getNextNumbers(info.numbers, gear.location); 
+        const gearRatio = gears.map(gear => {
+            const gearRatio = getNextNumbers(info.numbers, gear.location); 
+            if (gearRatio.length == 2){
+                return gearRatio;
+            }
         });
 
         function getNextNumbers(numbers, gearCoord){
-            const nextLines = numbers.filter(x => x.location[0][0] == gearCoord[0] || x.location[0][0] == gearCoord[0]+1 || x.location[0][0] == gearCoord[0]-1);
-            console.log(nextLines);
-            return nextLines
+            const nextLines = numbers.filter(x => [gearCoord[0], gearCoord[0]+1, gearCoord[0]-1].includes(x.location[0][0]));
+            const nextBlocks = nextLines.filter(findNextBlocks);
+            function findNextBlocks(number){
+                const nextBlocksCoord = [gearCoord[1], gearCoord[1]+1, gearCoord[1]-1];
+                let isNext = false;
+                number.location.forEach(loc => {
+                    if (nextBlocksCoord.includes(loc[1])){
+                        isNext = true;
+                    }
+                });
+                return isNext;
+            };
+            return nextBlocks;
         };
+        return gearRatio;
     };
 
     const result = getAllGearsRatio(information);
 
     let sum = 0;
-    result.forEach(number => {
-        sum += Number(number.number);
+    result.forEach(pair => {
+        if (pair){
+            sum += Number(pair[0].number) * Number(pair[1].number);
+        }
     });
     console.log(sum)
 });
