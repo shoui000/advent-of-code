@@ -3,9 +3,6 @@ import { readFile } from "node:fs";
 readFile('./data.txt', (err, input) => {
     if (err) throw err;
 
-    let data = input.toString('utf8').split('\n').slice(0, -1);
-    // data = data.slice(0, 4);
-
     function createMatrix(info){
         let matrix = []
         info.forEach((line, index) => {
@@ -20,11 +17,8 @@ readFile('./data.txt', (err, input) => {
         return matrix;
     };
 
-    const matrix = createMatrix(data);
-
     function findSymbolsAndNumbers(matrix){
         let info = {symbols: [], numbers: []};
-        let id = 0;
         matrix.forEach((line, lIndex) => {
             let lastIndex = -2;
             line.forEach((char, cIndex) =>{
@@ -36,8 +30,7 @@ readFile('./data.txt', (err, input) => {
                         info.numbers[info.numbers.length-1].number += char;
                         info.numbers[info.numbers.length-1].location.push([lIndex, cIndex]);
                     } else {
-                        info.numbers.push({number: char, location: [[lIndex, cIndex]], id: id}); 
-                        id++
+                        info.numbers.push({number: char, location: [[lIndex, cIndex]]})    
                     };
                     lastIndex = cIndex;
                 };
@@ -46,7 +39,33 @@ readFile('./data.txt', (err, input) => {
         return info;
     };
 
-    const information = findSymbolsAndNumbers(matrix);
+    function extractTrueNumbers(info){
+        let result = [];
+        info.numbers.forEach(number => {
+            let found = false;
+            number.location.forEach(coord => {
+                if (!found && findSymbol(coord, info)){
+                    result.push(number)
+                    found = true;
+                }
+            });
+        });
+
+        function findSymbol(coord, info){
+            let ret = false;
+            info.symbols.forEach(symbol => {
+                if (symbol.location[0] == coord[0]){
+                    if (symbol.location[1] == coord[1]+1 || symbol.location[1] == coord[1]-1){ret = true};
+                } else if (symbol.location[0] == coord[0]+1 || symbol.location[0] == coord[0]-1){
+                    if (symbol.location[1] == coord[1]) {ret = true};
+                    if (symbol.location[1] == coord[1]-1 || symbol.location[1] == coord[1]+1){ret = true};
+                };
+            });
+            return ret;
+        };
+
+        return result;
+    };
 
     function getAllGearsRatio(info){
         const gears = info.symbols.filter(x => x.char == '*');
@@ -76,13 +95,26 @@ readFile('./data.txt', (err, input) => {
         return gearRatio;
     };
 
-    const result = getAllGearsRatio(information);
+    let data = input.toString('utf8').split('\n').slice(0, -1);
 
-    let sum = 0;
-    result.forEach(pair => {
+    const matrix = createMatrix(data);
+    const information = findSymbolsAndNumbers(matrix);
+
+    const result = extractTrueNumbers(information);
+    const gearRatio = getAllGearsRatio(information);
+
+    let sumFirst = 0;
+    result.forEach(number => {
+        sumFirst += Number(number.number);
+    });
+
+    let sumSecond = 0;
+    gearRatio.forEach(pair => {
         if (pair){
-            sum += Number(pair[0].number) * Number(pair[1].number);
+            sumSecond += Number(pair[0].number) * Number(pair[1].number);
         }
     });
-    console.log(sum)
+
+    console.log(`First Answer: ${sumFirst}`);
+    console.log(`Second Answer: ${sumSecond}`);
 });

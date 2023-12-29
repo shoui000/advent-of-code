@@ -2,7 +2,7 @@
   "name": "",
   "version": "1.0.0",
   "description": "",
-  "main": "secondPuzzle.js",
+  "main": "index.js",
   "type": "module",
   "license": "AGPL-version-3.0",
   "private": false,
