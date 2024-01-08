@@ -18,7 +18,7 @@ readFile('./data.txt', (err, input) => {
 
     console.log(`First Puzzle:`, leastLocation);
 
-    const actualLeastLocation = findLeastLocationByRangeSeedNumbers([newSeedNumbers[0]], info.tables);
+    const actualLeastLocation = findLeastLocationByRangeSeedNumbers(newSeedNumbers, info.tables);
     console.log(`Second Puzzle:`, actualLeastLocation);
     console.timeEnd('teste')
 });
