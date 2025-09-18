@@ -31,6 +31,24 @@ void firstPuzzle(int *a, int *b, int n) {
 }
 
 void secondPuzzle(int *a, int *b, int n) {
+  int c = 0, sum = 0;
+
+  for (int i = 0; i < n; i++) {
+    c = 0;
+
+    for (int j = 0; j < n; j++) {
+      if (b[j] > a[i]) break; 
+
+      if (b[j] < a[i]) continue;
+
+      c++;
+    }
+
+    sum += a[i] * c;
+
+  }
+
+  printf("SecondPuzzle: The response is %d\n", sum);
 }
 
 int main(int argc, char *argv[]) {
@@ -49,12 +67,12 @@ int main(int argc, char *argv[]) {
       f = fopen("./input.txt", "r");
       break;
     default:
-      printf("FirstPuzzle: Wrong option\n");
+      printf("Main: Wrong option\n");
       exit(EXIT_FAILURE);
   }
 
   if (f == NULL) {
-    printf("FirstPuzzle: Error while reading input file\n");
+    printf("Main: Error while reading input file\n");
     exit(EXIT_FAILURE);
   }
 
@@ -70,7 +88,7 @@ int main(int argc, char *argv[]) {
       a = realloc(a, capacity * sizeof(int));
       b = realloc(b, capacity * sizeof(int));
       if (!a || !b) {
-        printf("FirstPuzzle: Memory allocation failed\n");
+        printf("Main: Memory allocation failed\n");
         exit(EXIT_FAILURE);
       }
     }
