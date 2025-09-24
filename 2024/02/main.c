@@ -33,6 +33,51 @@ void firstPuzzle(level *a, int n){
   printf("FirstPuzzle: The response is %d\n", sum);
 }
 
+int isSafe(level a) {
+  int direction = 0, difference = 0, safe = 1;
+  direction = ((a.numbers[0] - a.numbers[1]) < 0);
+
+  for (size_t j = 0; j < a.size-1; j++) {
+    difference = a.numbers[j] - a.numbers[j+1];
+
+    if (abs(difference) == 0 || abs(difference) > 3 || !(difference < 0 == direction)) {
+      safe = 0;
+      break;
+    }
+  }
+
+  return safe;
+}
+
+void secondPuzzle(level *a, int n){
+  int sum = 0;
+
+  for (size_t i = 0; i < n; i++) {
+    if (!isSafe(a[i])) {
+      level temp;
+
+      for (size_t j = 0; j < a[i].size; j++) {
+        temp.size = a[i].size-1;
+        temp.numbers = malloc(temp.size * sizeof(int));
+
+        memcpy(temp.numbers, a[i].numbers, j * sizeof(int));
+        memcpy(temp.numbers+j, a[i].numbers+j+1, (temp.size-j) * sizeof(int));
+
+        if (isSafe(temp)) {
+          sum++;
+          free(temp.numbers);
+          break;
+        }
+
+        free(temp.numbers);
+      }
+
+    } else { sum++; }
+  }
+
+  printf("SecondPuzzle: The response is %d\n", sum);
+}
+
 int main(int argc, char *argv[])
 {
   if (argc < 2) {
@@ -119,6 +164,7 @@ int main(int argc, char *argv[])
   }
 
   firstPuzzle(a, n);
+  secondPuzzle(a, n);
 
   exit(EXIT_SUCCESS);
 }
