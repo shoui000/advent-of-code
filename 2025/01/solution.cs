@@ -13,8 +13,10 @@ class Program {
 
 		Solution s = new Solution(option);
 		int fpSolution = s.FirstPuzzle();
+		int spSolution = s.SecondPuzzle();
 
 		Console.WriteLine($"FirstPuzzle: The answer is {fpSolution}");
+		Console.WriteLine($"SecondPuzzle: The answer is {spSolution}");
 
 	}
 
@@ -57,5 +59,32 @@ class Solution {
 		}
 
 		return sum;
+	}
+
+	public int SecondPuzzle() {
+		int pos = 50;
+		int sum = 0;
+
+		foreach (string line in input) {
+			int move = int.Parse(line.Substring(1));
+
+			if (move >= 100) {
+				sum += move / 100;
+				move %= 100;
+			}
+			if (line[0] == 'L' && move >= pos && pos != 0) sum++;
+			if (line[0] == 'R' && move >= 100 - pos) sum++;
+
+
+			if (line[0] == 'L') move *= -1;
+
+			pos += move;
+			
+			if (pos < 0) pos += 100;
+			if (pos > 99) pos %= 100;
+		}
+
+		return sum;
+
 	}
 }
