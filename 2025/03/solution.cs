@@ -1,5 +1,5 @@
 using System;
-
+using System.Collections.Generic;
 
 namespace AdventOfCode_2025_day03;
 
@@ -13,8 +13,10 @@ class Program {
 
 		Solution s = new Solution(option);
 		long fpSolution = s.FirstPuzzle();
+		long spSolution = s.SecondPuzzle();
 
 		Console.WriteLine($"FirstPuzzle: The answer is {fpSolution}");
+		Console.WriteLine($"SecondPuzzle: The answer is {spSolution}");
 	}
 }
 
@@ -78,6 +80,28 @@ class Solution {
 
 		}
 
+		return sum;
+	}
+
+	public long SecondPuzzle() {
+		long sum = 0;
+
+		foreach (string line in input) {
+			List<int> numbers = new List<int>();
+			int[] maxNumber = new int[12];
+			int lastPos = -1;
+
+			foreach (char c in line) numbers.Add(c - '0');
+
+			for (int i = 0; i < maxNumber.Length; i++) {
+				List<int> sublist = numbers.GetRange(lastPos + 1, (numbers.Count - (11 - i)) - lastPos - 1);
+				maxNumber[i] = sublist.Max();
+				lastPos += 1 + sublist.IndexOf(sublist.Max());
+			}
+
+			sum += long.Parse(string.Join("", maxNumber));
+		}
+		
 		return sum;
 	}
 }
