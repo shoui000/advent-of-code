@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode_2025_day02;
 
@@ -13,8 +14,10 @@ class Program {
 
 		Solution s = new Solution(option);
 		long fpSolution = s.FirstPuzzle();
+		long spSolution = s.SecondPuzzle();
 
 		Console.WriteLine($"FirstPuzzle: The answer is {fpSolution}");
+		Console.WriteLine($"SecondPuzzle: The answer is {spSolution}");
 
 	}
 
@@ -58,6 +61,26 @@ class Solution {
 				if (number > lastId) break;
 
 				i++;
+			}
+
+		}
+
+		return sum;
+	}
+
+	public long SecondPuzzle() {
+		string[] list = input[0].Split(",");
+		long sum = 0;
+
+		foreach (string idRange in list) {
+			string[] range = idRange.Split("-");
+			long firstId = long.Parse(range[0]);
+			long lastId = long.Parse(range[1]);
+
+			for (long i = firstId; i <= lastId; i++) {
+				if (Regex.IsMatch($"{i}", @"^(\d+)\1+$")) {
+					sum += i;
+				}
 			}
 
 		}
