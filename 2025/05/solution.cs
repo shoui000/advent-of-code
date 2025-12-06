@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace AdventOfCode_2025_day01;
@@ -13,9 +14,64 @@ class Program {
 
 		Solution s = new Solution(option);
 		int fpSolution = s.FirstPuzzle();
+		long spSolution = s.SecondPuzzle();
 
 		Console.WriteLine($"FirstPuzzle: The answer is {fpSolution}");
+		Console.WriteLine($"SecondPuzzle: The answer is {spSolution}");
 	}
+}
+
+class Ranges : IEnumerable<long[]> {
+	private List<long[]> ranges;
+
+	public Ranges() {
+		ranges = new List<long[]>();
+	}
+
+	public void addRange(long[] rg) {
+		bool overlapped = false;
+
+		foreach (long[] r in ranges) {
+			if (rg[1] < r[0] || rg[0] > r[1]) {
+				continue;
+			}
+
+			overlapped = true;
+
+			if (rg[0] >= r[0] && rg [1] <= r[1]) {
+				break;
+			}
+
+			if (rg[1] >= r[0] && rg[1] <= r[1]) {
+				this.addRange(new long[] {rg[0], r[0]-1});
+				break;
+			} else if (rg[0] <= r[1] && rg[0] >= r[0]) {
+				this.addRange(new long[] {r[1]+1, rg[1]});
+				break;
+			} else if (rg[0] < r[0] && rg[1] > r[1]) {
+				this.addRange(new long[] {rg[0], r[0]-1});
+				this.addRange(new long[] {r[1]+1, rg[1]});
+				break;
+			}
+		}
+
+		if (!overlapped) {
+			ranges.Add(rg);
+		}
+	}
+
+	public IEnumerator<long[]> GetEnumerator() {
+		return ((IEnumerable<long[]>)ranges).GetEnumerator();
+	}
+
+	IEnumerator IEnumerable.GetEnumerator() {
+		return GetEnumerator();
+	}
+
+	public override string ToString() {
+		return string.Join(", ", ranges.Select(r => $"[{r[0]}, {r[1]}]"));
+	}
+
 }
 
 class Solution {
@@ -63,6 +119,28 @@ class Solution {
 				}
 			}
 
+		}
+
+		return sum;
+	}
+
+	public long SecondPuzzle() {
+		long sum = 0;
+		Ranges rgs = new Ranges();
+
+		foreach (string line in input) {
+			if (line == "") {
+				break;
+			}
+
+			string[] a = line.Split("-");
+			long[] rg = new long[] { long.Parse(a[0]), long.Parse(a[1]) };
+			rgs.addRange(rg);
+
+		}
+
+		foreach (long[] r in rgs) {
+			sum += (r[1] - r[0]) + 1;
 		}
 
 		return sum;
