@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace AdventOfCode_2025_day07;
 
@@ -12,10 +13,10 @@ class Program {
 
 		Solution s = new Solution(option);
 		int fpSolution = s.FirstPuzzle();
-		// int spSolution = s.SecondPuzzle();
+		long spSolution = s.SecondPuzzle();
 
 		Console.WriteLine($"FirstPuzzle: The answer is {fpSolution}");
-		// Console.WriteLine($"SecondPuzzle: The answer is {spSolution}");
+		Console.WriteLine($"SecondPuzzle: The answer is {spSolution}");
 	}
 }
 
@@ -83,4 +84,87 @@ class Solution {
 
 		return sum;
 	}
+
+	public long SecondPuzzle() {
+		QuantumManifold qm = new QuantumManifold(input);
+
+		return qm.Compute();
+	}
+}
+
+class QuantumManifold {
+	private char[,] matrix;
+	private int rows, cols, startX, startY;
+	private long?[,] memo;
+
+	public QuantumManifold(string[] input) {
+		rows = input.Length;
+		cols = input[0].Length;
+		matrix = new char[rows, cols];
+		memo = new long?[rows, cols];
+
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				matrix[i, j] = input[i][j];
+			}
+		}
+
+		startX = 1;
+		startY = input[0].IndexOf('S');
+	}
+
+	public long Compute() {
+		return _Step(startY, startX);
+	}
+
+	public string ToString(int x, int y) {
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				if (i == y && j == x) {
+					sb.Append('*');
+				} else {
+					sb.Append(matrix[i, j]);
+				}
+			}
+
+			sb.Append('\n');
+		}
+
+		return sb.ToString();
+	}
+
+	private long _Step(int x, int y) {
+		if (y == rows-1)
+			return 1;
+
+		if (memo[y, x].HasValue)
+			return memo[y, x].GetValueOrDefault();
+
+		long total = 0;
+		List<long> branches = new List<long>();
+
+		if (matrix[y+1, x] == '.')
+			branches.Add(_Step(x, y+1));
+
+		if (matrix[y+1, x] == '^') {
+			if (x > 0)
+				branches.Add(_Step(x-1, y+1));
+
+			if (x < cols-1)
+				branches.Add(_Step(x+1, y+1));
+		}
+
+		if (branches.Count > 0)
+			total += branches[0];
+
+		for (int i = 1; i < branches.Count; i++)
+			total += branches[i];
+		
+		memo[y, x] = total;
+		return total;
+
+	}
+
 }
