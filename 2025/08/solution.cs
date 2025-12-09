@@ -15,10 +15,10 @@ class Program {
 
 		Solution s = new Solution(option);
 		long fpSolution = s.FirstPuzzle();
-		// int spSolution = s.SecondPuzzle();
+		long spSolution = s.SecondPuzzle();
 
 		Console.WriteLine($"FirstPuzzle: The answer is {fpSolution}");
-		// Console.WriteLine($"SecondPuzzle: The answer is {spSolution}");
+		Console.WriteLine($"SecondPuzzle: The answer is {spSolution}");
 
 	}
 
@@ -105,6 +105,66 @@ class Solution {
 		}
 
 		return sum;
+	}
+
+	public long SecondPuzzle() {
+		Vector3[] vetores = new Vector3[input.Length];
+		List<Aresta> arestas = new List<Aresta>();
+		List<Circuito> circuitos = new List<Circuito>();
+
+		for (int i = 0; i < vetores.Length; i++) {
+			string[] xyz = input[i].Split(",");
+			vetores[i] = new Vector3(int.Parse(xyz[0]), int.Parse(xyz[1]), int.Parse(xyz[2]));
+		}
+
+		for (int i = 0; i < vetores.Length; i++) {
+			for (int j = i+1; j < vetores.Length; j++) {
+				arestas.Add(new Aresta(vetores[i], vetores[j]));
+			}
+		}
+
+		arestas.Sort();
+
+		bool contains = false;
+		int n = 0;
+		while (true) {
+			contains = false;
+
+			for (int j = 0; j < circuitos.Count; j++) {
+				if (circuitos[j].HasAresta(arestas[n])) {
+					contains = true;
+					break;
+				}
+
+				if (circuitos[j].HasVetors(arestas[n])) {
+
+					for (int x = 0; x < circuitos.Count; x++) {
+						if (x == j) continue;
+
+						if (circuitos[x].HasVetors(arestas[n])) {
+							circuitos[j].MergeCircuit(circuitos[x]);
+							circuitos.Remove(circuitos[x]);
+							break;
+						}
+					}
+
+					circuitos[j].AddAresta(arestas[n]);
+
+					if (circuitos[j].Vetores.Count == vetores.Length) {
+						return (long)arestas[n].Vetor1.X * (long)arestas[n].Vetor2.X;
+					}
+
+					contains = true;
+					break;
+				}
+			}
+
+			if (!contains) {
+				circuitos.Add(new Circuito(arestas[n]));
+			}
+
+			n++;
+		}
 	}
 }
 
